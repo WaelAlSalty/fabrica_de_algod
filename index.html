@@ -20,8 +20,93 @@
       padding-bottom: 40px;
     }
 
+    /* Tela de Bloqueio por Senha */
+    #lockScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999999;
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .login-card h2 {
+      font-size: 18px;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .login-card input {
+      width: 100%;
+      height: 46px;
+      padding: 0 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .login-card input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+    }
+
+    .login-card button {
+      width: 100%;
+      height: 46px;
+      background-color: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .login-card button:active {
+      background-color: #0369a1;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Conteúdo Principal do Aplicativo */
+    #appContent {
+      display: none; /* Inicia oculto até validar a senha */
+    }
+
     header {
       margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
     }
 
     header h1 {
@@ -34,6 +119,17 @@
       font-size: 13px;
       color: #64748b;
       margin-top: 2px;
+    }
+
+    .btn-logout {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     /* Bloco de Anúncio */
@@ -277,105 +373,163 @@
 </head>
 <body>
 
-  <header>
-    <h1>Termometria & Pesagem</h1>
-    <p>Monitoramento de fardos em campo</p>
-  </header>
-
-  <!-- BEGIN AADS AD UNIT 2454885 -->
-  <div id="frame" class="ad-container">
-    <iframe data-aa='2454885' src='//acceptable.a-ads.com/2454885/?size=Adaptive'
-            style='border:0; padding:0; width:100%; max-width:468px; height:auto; min-height:60px; overflow:hidden; display:block; margin:auto;'></iframe>
-  </div>
-  <!-- END AADS AD UNIT 2454885 -->
-
-  <!-- Status Térmico Geral -->
-  <div id="statusBanner" class="banner-status banner-ok">
-    <span id="statusBannerText">Operação Estável</span>
-    <span id="statusBannerDetail">Sem registros</span>
-  </div>
-
-  <!-- Cards de Resumo -->
-  <div class="summary-grid">
-    <div class="summary-card">
-      <div class="summary-title">Média Térmica</div>
-      <div class="summary-value" id="dispAvgTemp">0.0 °C</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-title">Umidade Média</div>
-      <div class="summary-value" id="dispAvgHum">0.0 %</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-title">Peso Total Líq.</div>
-      <div class="summary-value" id="dispTotalWeight">0.0 kg</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-title">Total Fardos</div>
-      <div class="summary-value" id="dispBaleCount">0</div>
+  <!-- Tela de Bloqueio -->
+  <div id="lockScreen">
+    <div class="login-card">
+      <h2>Acesso Restrito</h2>
+      <p>Digite a senha para acessar o controle de fardos</p>
+      <form id="passwordForm">
+        <input type="password" id="accessPassword" placeholder="Senha de acesso" autocomplete="current-password" required>
+        <button type="submit">Entrar no Sistema</button>
+        <div id="passwordError" class="error-msg">Senha incorreta. Tente novamente.</div>
+      </form>
     </div>
   </div>
 
-  <!-- Formulário Rápido -->
-  <section class="form-card">
-    <div class="form-title">Adicionar Fardo</div>
-    <form id="mobileForm">
-      <div class="field">
-        <label for="baleId">Identificação do Fardo / Lote</label>
-        <input type="text" id="baleId" placeholder="Ex: Lote 101" required>
+  <!-- Conteúdo do Aplicativo -->
+  <div id="appContent">
+    <header>
+      <div>
+        <h1>Termometria & Pesagem</h1>
+        <p>Monitoramento de fardos em campo</p>
       </div>
+      <button type="button" class="btn-logout" onclick="logout()">Sair</button>
+    </header>
 
-      <div class="field-row-2 field">
-        <div>
-          <label for="grossWeight">Bruto (kg)</label>
-          <input type="number" step="0.1" inputmode="decimal" id="grossWeight" placeholder="Ex: 228.0" required>
-        </div>
-        <div>
-          <label for="tareWeight">Tara (kg)</label>
-          <input type="number" step="0.1" inputmode="decimal" id="tareWeight" value="3.0" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="humidity">Umidade (%)</label>
-        <input type="number" step="0.1" inputmode="decimal" id="humidity" placeholder="Ex: 7.2" required>
-      </div>
-
-      <div class="sub-heading">Sonda Térmica Multiponto (°C)</div>
-
-      <div class="field-row-3 field">
-        <div>
-          <label for="p1">Ponto 1</label>
-          <input type="number" step="0.1" inputmode="decimal" id="p1" placeholder="Ex: 24.2" required>
-        </div>
-        <div>
-          <label for="p2">Ponto 2</label>
-          <input type="number" step="0.1" inputmode="decimal" id="p2" placeholder="Ex: 25.0" required>
-        </div>
-        <div>
-          <label for="p3">Ponto 3</label>
-          <input type="number" step="0.1" inputmode="decimal" id="p3" placeholder="Ex: 24.6" required>
-        </div>
-      </div>
-
-      <div class="live-preview">
-        <span>Média calculada:</span>
-        <strong id="liveAvgDisplay">0.0 °C</strong>
-      </div>
-
-      <button type="submit" class="btn-submit">Salvar Fardo</button>
-    </form>
-  </section>
-
-  <!-- Listagem Dinâmica -->
-  <section>
-    <div class="list-header">
-      <div class="list-title">Histórico Registrado</div>
-      <button type="button" id="btnClearAll" onclick="clearAllBales()" class="btn-delete-card" style="color: #64748b; display: none;">Limpar Tudo</button>
+    <!-- BEGIN AADS AD UNIT 2454885 -->
+    <div id="frame" class="ad-container">
+      <iframe data-aa='2454885' src='//acceptable.a-ads.com/2454885/?size=Adaptive'
+              style='border:0; padding:0; width:100%; max-width:468px; height:auto; min-height:60px; overflow:hidden; display:block; margin:auto;'></iframe>
     </div>
-    <div id="baleCardsContainer"></div>
-  </section>
+    <!-- END AADS AD UNIT 2454885 -->
+
+    <!-- Status Térmico Geral -->
+    <div id="statusBanner" class="banner-status banner-ok">
+      <span id="statusBannerText">Operação Estável</span>
+      <span id="statusBannerDetail">Sem registros</span>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-title">Média Térmica</div>
+        <div class="summary-value" id="dispAvgTemp">0.0 °C</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Umidade Média</div>
+        <div class="summary-value" id="dispAvgHum">0.0 %</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Peso Total Líq.</div>
+        <div class="summary-value" id="dispTotalWeight">0.0 kg</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Total Fardos</div>
+        <div class="summary-value" id="dispBaleCount">0</div>
+      </div>
+    </div>
+
+    <!-- Formulário Rápido -->
+    <section class="form-card">
+      <div class="form-title">Adicionar Fardo</div>
+      <form id="mobileForm">
+        <div class="field">
+          <label for="baleId">Identificação do Fardo / Lote</label>
+          <input type="text" id="baleId" placeholder="Ex: Lote 101" required>
+        </div>
+
+        <div class="field-row-2 field">
+          <div>
+            <label for="grossWeight">Bruto (kg)</label>
+            <input type="number" step="0.1" inputmode="decimal" id="grossWeight" placeholder="Ex: 228.0" required>
+          </div>
+          <div>
+            <label for="tareWeight">Tara (kg)</label>
+            <input type="number" step="0.1" inputmode="decimal" id="tareWeight" value="3.0" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="humidity">Umidade (%)</label>
+          <input type="number" step="0.1" inputmode="decimal" id="humidity" placeholder="Ex: 7.2" required>
+        </div>
+
+        <div class="sub-heading">Sonda Térmica Multiponto (°C)</div>
+
+        <div class="field-row-3 field">
+          <div>
+            <label for="p1">Ponto 1</label>
+            <input type="number" step="0.1" inputmode="decimal" id="p1" placeholder="Ex: 24.2" required>
+          </div>
+          <div>
+            <label for="p2">Ponto 2</label>
+            <input type="number" step="0.1" inputmode="decimal" id="p2" placeholder="Ex: 25.0" required>
+          </div>
+          <div>
+            <label for="p3">Ponto 3</label>
+            <input type="number" step="0.1" inputmode="decimal" id="p3" placeholder="Ex: 24.6" required>
+          </div>
+        </div>
+
+        <div class="live-preview">
+          <span>Média calculada:</span>
+          <strong id="liveAvgDisplay">0.0 °C</strong>
+        </div>
+
+        <button type="submit" class="btn-submit">Salvar Fardo</button>
+      </form>
+    </section>
+
+    <!-- Listagem Dinâmica -->
+    <section>
+      <div class="list-header">
+        <div class="list-title">Histórico Registrado</div>
+        <button type="button" id="btnClearAll" onclick="clearAllBales()" class="btn-delete-card" style="color: #64748b; display: none;">Limpar Tudo</button>
+      </div>
+      <div id="baleCardsContainer"></div>
+    </section>
+  </div>
 
   <script>
+    // Gerenciamento de Senha
+    const MASTER_PASS = "rodrigocardozo";
+
+    function checkAuth() {
+      const isAuth = sessionStorage.getItem("cotton_auth") === "true";
+      if (isAuth) {
+        document.getElementById("lockScreen").style.display = "none";
+        document.getElementById("appContent").style.display = "block";
+        renderApp();
+      } else {
+        document.getElementById("lockScreen").style.display = "flex";
+        document.getElementById("appContent").style.display = "none";
+        document.getElementById("accessPassword").focus();
+      }
+    }
+
+    document.getElementById("passwordForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const enteredPass = document.getElementById("accessPassword").value;
+      const errorDiv = document.getElementById("passwordError");
+
+      if (enteredPass === MASTER_PASS) {
+        sessionStorage.setItem("cotton_auth", "true");
+        errorDiv.style.display = "none";
+        document.getElementById("accessPassword").value = "";
+        checkAuth();
+      } else {
+        errorDiv.style.display = "block";
+        document.getElementById("accessPassword").value = "";
+        document.getElementById("accessPassword").focus();
+      }
+    });
+
+    function logout() {
+      sessionStorage.removeItem("cotton_auth");
+      checkAuth();
+    }
+
+    // Persistência e Dados dos Fardos
     let bales = JSON.parse(localStorage.getItem('cotton_bales_mobile')) || [];
 
     function saveToStorage() {
@@ -530,7 +684,7 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', renderApp);
+    window.addEventListener('DOMContentLoaded', checkAuth);
   </script>
 </body>
 </html>
