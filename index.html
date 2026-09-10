@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Controle de Fardos - Mobile</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      padding: 12px;
+      padding-bottom: 40px;
+    }
+
+    header {
+      margin-bottom: 14px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    header p {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Resumo Rápido */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .summary-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .summary-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 4px;
+    }
+
+    .banner-status {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .banner-ok {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .banner-alert {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    /* Card Formulário */
+    .form-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0f172a;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      height: 44px;
+      padding: 0 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      background-color: #ffffff;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+    }
+
+    .sub-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #0284c7;
+      margin: 14px 0 8px 0;
+    }
+
+    .live-preview {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .live-preview strong {
+      font-size: 16px;
+      color: #0369a1;
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      background-color: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-submit:active {
+      background-color: #0369a1;
+    }
+
+    /* Lista de Fardos em Cards */
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .list-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 16px;
+      background: #ffffff;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .bale-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .bale-card.hotspot {
+      border-left: 5px solid #dc2626;
+    }
+
+    .bale-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .bale-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .bale-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .probe-points {
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .btn-delete-card {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Termometria & Pesagem</h1>
+    <p>Monitoramento de fardos em campo</p>
+  </header>
+
+  <!-- Status Térmico Geral -->
+  <div id="statusBanner" class="banner-status banner-ok">
+    <span id="statusBannerText">Operação Estável</span>
+    <span id="statusBannerDetail">Sem registros</span>
+  </div>
+
+  <!-- Cards de Resumo -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-title">Média Térmica</div>
+      <div class="summary-value" id="dispAvgTemp">0.0 °C</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Umidade Média</div>
+      <div class="summary-value" id="dispAvgHum">0.0 %</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Peso Total Líq.</div>
+      <div class="summary-value" id="dispTotalWeight">0.0 kg</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Total Fardos</div>
+      <div class="summary-value" id="dispBaleCount">0</div>
+    </div>
+  </div>
+
+  <!-- Formulário Rápido -->
+  <section class="form-card">
+    <div class="form-title">Adicionar Fardo</div>
+    <form id="mobileForm">
+      <div class="field">
+        <label for="baleId">Identificação do Fardo / Lote</label>
+        <input type="text" id="baleId" placeholder="Ex: Lote 101" required>
+      </div>
+
+      <div class="field-row-2 field">
+        <div>
+          <label for="grossWeight">Bruto (kg)</label>
+          <input type="number" step="0.1" inputmode="decimal" id="grossWeight" placeholder="Ex: 228.0" required>
+        </div>
+        <div>
+          <label for="tareWeight">Tara (kg)</label>
+          <input type="number" step="0.1" inputmode="decimal" id="tareWeight" value="3.0" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="humidity">Umidade (%)</label>
+        <input type="number" step="0.1" inputmode="decimal" id="humidity" placeholder="Ex: 7.2" required>
+      </div>
+
+      <div class="sub-heading">Sonda Térmica Multiponto (°C)</div>
+
+      <div class="field-row-3 field">
+        <div>
+          <label for="p1">Ponto 1</label>
+          <input type="number" step="0.1" inputmode="decimal" id="p1" placeholder="Ex: 24.2" required>
+        </div>
+        <div>
+          <label for="p2">Ponto 2</label>
+          <input type="number" step="0.1" inputmode="decimal" id="p2" placeholder="Ex: 25.0" required>
+        </div>
+        <div>
+          <label for="p3">Ponto 3</label>
+          <input type="number" step="0.1" inputmode="decimal" id="p3" placeholder="Ex: 24.6" required>
+        </div>
+      </div>
+
+      <div class="live-preview">
+        <span>Média calculada:</span>
+        <strong id="liveAvgDisplay">0.0 °C</strong>
+      </div>
+
+      <button type="submit" class="btn-submit">Salvar Fardo</button>
+    </form>
+  </section>
+
+  <!-- Listagem Dinâmica -->
+  <section>
+    <div class="list-header">
+      <div class="list-title">Histórico Registrado</div>
+      <button type="button" id="btnClearAll" onclick="clearAllBales()" class="btn-delete-card" style="color: #64748b; display: none;">Limpar Tudo</button>
+    </div>
+    <div id="baleCardsContainer"></div>
+  </section>
+
+  <script>
+    // Inicia sem registros mocados
+    let bales = JSON.parse(localStorage.getItem('cotton_bales_mobile')) || [];
+
+    function saveToStorage() {
+      localStorage.setItem('cotton_bales_mobile', JSON.stringify(bales));
+    }
+
+    // Cálculo dinâmico pré-registro
+    function updateLivePreview() {
+      const p1 = parseFloat(document.getElementById('p1').value) || 0;
+      const p2 = parseFloat(document.getElementById('p2').value) || 0;
+      const p3 = parseFloat(document.getElementById('p3').value) || 0;
+
+      let validCount = 0;
+      let sum = 0;
+
+      if (document.getElementById('p1').value !== '') { sum += p1; validCount++; }
+      if (document.getElementById('p2').value !== '') { sum += p2; validCount++; }
+      if (document.getElementById('p3').value !== '') { sum += p3; validCount++; }
+
+      const avg = validCount > 0 ? (sum / validCount).toFixed(1) : '0.0';
+      document.getElementById('liveAvgDisplay').innerText = `${avg} °C`;
+    }
+
+    ['p1', 'p2', 'p3'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateLivePreview);
+    });
+
+    // Renderização dos cards e indicadores
+    function renderApp() {
+      const container = document.getElementById('baleCardsContainer');
+      const btnClear = document.getElementById('btnClearAll');
+      container.innerHTML = '';
+
+      let totalNetWeight = 0;
+      let sumTemp = 0;
+      let sumHum = 0;
+      let hasHotspot = false;
+      const count = bales.length;
+
+      if (count === 0) {
+        btnClear.style.display = 'none';
+        container.innerHTML = `<div class="empty-state">Nenhum fardo cadastrado até o momento.</div>`;
+      } else {
+        btnClear.style.display = 'block';
+        bales.forEach((bale, index) => {
+          totalNetWeight += bale.netWeight;
+          sumTemp += bale.avgTemp;
+          sumHum += bale.humidity;
+
+          const isHot = bale.temp1 > 30.0 || bale.temp2 > 30.0 || bale.temp3 > 30.0 || bale.avgTemp > 30.0;
+          const isWet = bale.humidity > 8.5;
+
+          if (isHot || isWet) hasHotspot = true;
+
+          const card = document.createElement('div');
+          card.className = `bale-card ${isHot ? 'hotspot' : ''}`;
+          card.innerHTML = `
+            <div class="bale-card-top">
+              <div class="bale-card-title">${bale.id}</div>
+              <button class="btn-delete-card" onclick="removeBale(${index})">Excluir</button>
+            </div>
+            <div class="bale-metrics">
+              <div>Líquido: <strong>${bale.netWeight.toFixed(1)} kg</strong></div>
+              <div>Umidade: <strong style="${isWet ? 'color: #dc2626;' : ''}">${bale.humidity.toFixed(1)}%</strong></div>
+              <div>Média Sonda: <strong style="${isHot ? 'color: #dc2626;' : ''}">${bale.avgTemp.toFixed(1)}°C</strong></div>
+              <div>Bruto / Tara: ${bale.grossWeight.toFixed(1)} / ${bale.tare.toFixed(1)}kg</div>
+            </div>
+            <div class="probe-points">
+              <span>P1: ${bale.temp1.toFixed(1)}°C</span>
+              <span>P2: ${bale.temp2.toFixed(1)}°C</span>
+              <span>P3: ${bale.temp3.toFixed(1)}°C</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      const avgT = count > 0 ? (sumTemp / count).toFixed(1) : '0.0';
+      const avgH = count > 0 ? (sumHum / count).toFixed(1) : '0.0';
+
+      document.getElementById('dispAvgTemp').innerText = `${avgT} °C`;
+      document.getElementById('dispAvgHum').innerText = `${avgH} %`;
+      document.getElementById('dispTotalWeight').innerText = `${totalNetWeight.toFixed(1)} kg`;
+      document.getElementById('dispBaleCount').innerText = count;
+
+      const banner = document.getElementById('statusBanner');
+      const bannerText = document.getElementById('statusBannerText');
+      const bannerDetail = document.getElementById('statusBannerDetail');
+
+      if (count === 0) {
+        banner.className = 'banner-status banner-ok';
+        bannerText.innerText = 'Operação Estável';
+        bannerDetail.innerText = 'Sem registros';
+      } else if (hasHotspot || parseFloat(avgT) > 30.0) {
+        banner.className = 'banner-status banner-alert';
+        bannerText.innerText = 'Alerta Térmico Detectado';
+        bannerDetail.innerText = '> 30°C';
+      } else {
+        banner.className = 'banner-status banner-ok';
+        bannerText.innerText = 'Operação Estável';
+        bannerDetail.innerText = 'Normal';
+      }
+
+      saveToStorage();
+    }
+
+    // Salvar novo fardo
+    document.getElementById('mobileForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('baleId').value.trim();
+      const gross = parseFloat(document.getElementById('grossWeight').value);
+      const tare = parseFloat(document.getElementById('tareWeight').value);
+      const hum = parseFloat(document.getElementById('humidity').value);
+      const p1 = parseFloat(document.getElementById('p1').value);
+      const p2 = parseFloat(document.getElementById('p2').value);
+      const p3 = parseFloat(document.getElementById('p3').value);
+
+      const netWeight = parseFloat((gross - tare).toFixed(2));
+      const avgTemp = parseFloat(((p1 + p2 + p3) / 3).toFixed(1));
+
+      bales.unshift({
+        id: id,
+        grossWeight: gross,
+        tare: tare,
+        netWeight: netWeight,
+        temp1: p1,
+        temp2: p2,
+        temp3: p3,
+        avgTemp: avgTemp,
+        humidity: hum
+      });
+
+      renderApp();
+
+      // Limpar formulário mantendo apenas tara padrão
+      document.getElementById('baleId').value = '';
+      document.getElementById('grossWeight').value = '';
+      document.getElementById('humidity').value = '';
+      document.getElementById('p1').value = '';
+      document.getElementById('p2').value = '';
+      document.getElementById('p3').value = '';
+      document.getElementById('liveAvgDisplay').innerText = '0.0 °C';
+      document.getElementById('baleId').focus();
+    });
+
+    function removeBale(index) {
+      bales.splice(index, 1);
+      renderApp();
+    }
+
+    function clearAllBales() {
+      if (confirm('Deseja apagar todos os registros da memória?')) {
+        bales = [];
+        renderApp();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', renderApp);
+  </script>
+</body>
+</html>
