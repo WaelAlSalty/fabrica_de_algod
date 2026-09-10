@@ -36,6 +36,16 @@
       margin-top: 2px;
     }
 
+    /* Bloco de Anúncio */
+    .ad-container {
+      width: 100%;
+      margin: 0 auto 16px auto;
+      position: relative;
+      z-index: 99998;
+      display: flex;
+      justify-content: center;
+    }
+
     /* Resumo Rápido */
     .summary-grid {
       display: grid;
@@ -272,6 +282,13 @@
     <p>Monitoramento de fardos em campo</p>
   </header>
 
+  <!-- BEGIN AADS AD UNIT 2454885 -->
+  <div id="frame" class="ad-container">
+    <iframe data-aa='2454885' src='//acceptable.a-ads.com/2454885/?size=Adaptive'
+            style='border:0; padding:0; width:100%; max-width:468px; height:auto; min-height:60px; overflow:hidden; display:block; margin:auto;'></iframe>
+  </div>
+  <!-- END AADS AD UNIT 2454885 -->
+
   <!-- Status Térmico Geral -->
   <div id="statusBanner" class="banner-status banner-ok">
     <span id="statusBannerText">Operação Estável</span>
@@ -359,14 +376,12 @@
   </section>
 
   <script>
-    // Inicia sem registros mocados
     let bales = JSON.parse(localStorage.getItem('cotton_bales_mobile')) || [];
 
     function saveToStorage() {
       localStorage.setItem('cotton_bales_mobile', JSON.stringify(bales));
     }
 
-    // Cálculo dinâmico pré-registro
     function updateLivePreview() {
       const p1 = parseFloat(document.getElementById('p1').value) || 0;
       const p2 = parseFloat(document.getElementById('p2').value) || 0;
@@ -387,7 +402,6 @@
       document.getElementById(id).addEventListener('input', updateLivePreview);
     });
 
-    // Renderização dos cards e indicadores
     function renderApp() {
       const container = document.getElementById('baleCardsContainer');
       const btnClear = document.getElementById('btnClearAll');
@@ -466,7 +480,6 @@
       saveToStorage();
     }
 
-    // Salvar novo fardo
     document.getElementById('mobileForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -495,7 +508,6 @@
 
       renderApp();
 
-      // Limpar formulário mantendo apenas tara padrão
       document.getElementById('baleId').value = '';
       document.getElementById('grossWeight').value = '';
       document.getElementById('humidity').value = '';
