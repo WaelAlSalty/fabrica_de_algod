@@ -99,7 +99,7 @@
 
     /* Conteúdo Principal do Aplicativo */
     #appContent {
-      display: none; /* Inicia oculto até validar a senha */
+      display: none;
     }
 
     header {
@@ -136,10 +136,10 @@
     .ad-container {
       width: 100%;
       margin: 0 auto 16px auto;
-      position: relative;
-      z-index: 99998;
       display: flex;
       justify-content: center;
+      align-items: center;
+      min-height: 60px;
     }
 
     /* Resumo Rápido */
@@ -396,12 +396,8 @@
       <button type="button" class="btn-logout" onclick="logout()">Sair</button>
     </header>
 
-    <!-- BEGIN AADS AD UNIT 2454885 -->
-    <div id="frame" class="ad-container">
-      <iframe data-aa='2454885' src='//acceptable.a-ads.com/2454885/?size=Adaptive'
-              style='border:0; padding:0; width:100%; max-width:468px; height:auto; min-height:60px; overflow:hidden; display:block; margin:auto;'></iframe>
-    </div>
-    <!-- END AADS AD UNIT 2454885 -->
+    <!-- CONTAINER DE ANÚNCIO (Carregado apenas pós-login) -->
+    <div id="frame" class="ad-container"></div>
 
     <!-- Status Térmico Geral -->
     <div id="statusBanner" class="banner-status banner-ok">
@@ -494,13 +490,39 @@
     // Gerenciamento de Senha
     const MASTER_PASS = "rodrigocardozo";
 
+    function loadAdBanner() {
+      const adContainer = document.getElementById("frame");
+      if (adContainer && !adContainer.hasChildNodes()) {
+        const iframe = document.createElement("iframe");
+        iframe.setAttribute("data-aa", "2454885");
+        iframe.src = "//acceptable.a-ads.com/2454885/?size=Adaptive";
+        iframe.style.border = "0";
+        iframe.style.padding = "0";
+        iframe.style.width = "100%";
+        iframe.style.maxWidth = "468px";
+        iframe.style.height = "60px";
+        iframe.style.display = "block";
+        iframe.style.margin = "auto";
+        adContainer.appendChild(iframe);
+      }
+    }
+
+    function unloadAdBanner() {
+      const adContainer = document.getElementById("frame");
+      if (adContainer) {
+        adContainer.innerHTML = "";
+      }
+    }
+
     function checkAuth() {
       const isAuth = sessionStorage.getItem("cotton_auth") === "true";
       if (isAuth) {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("appContent").style.display = "block";
+        loadAdBanner();
         renderApp();
       } else {
+        unloadAdBanner();
         document.getElementById("lockScreen").style.display = "flex";
         document.getElementById("appContent").style.display = "none";
         document.getElementById("accessPassword").focus();
