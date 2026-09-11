@@ -3,31 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Controle de Fardos - Mobile</title>
+  <title>Sistema de Gestão & Termometria de Fardos de Algodão</title>
+  
+  <!-- Biblioteca de Gráficos Profissional -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: #f8fafc;
+      background-color: #0f172a;
       color: #0f172a;
-      padding: 12px;
-      padding-bottom: 40px;
+      min-height: 100vh;
     }
 
-    /* Tela de Bloqueio por Senha */
+    /* Tela de Bloqueio / Autenticação */
     #lockScreen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #0f172a;
+      background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -37,55 +40,71 @@
 
     .login-card {
       background: #ffffff;
-      border-radius: 14px;
-      padding: 24px 20px;
+      border-radius: 16px;
+      padding: 32px 24px;
       width: 100%;
-      max-width: 360px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       text-align: center;
+      border: 1px solid #334155;
+    }
+
+    .login-badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
     }
 
     .login-card h2 {
-      font-size: 18px;
+      font-size: 20px;
       color: #0f172a;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .login-card p {
       font-size: 13px;
       color: #64748b;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .login-card input {
       width: 100%;
-      height: 46px;
-      padding: 0 12px;
+      height: 48px;
+      padding: 0 14px;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 15px;
       outline: none;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      transition: all 0.2s;
     }
 
     .login-card input:focus {
       border-color: #0284c7;
-      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
     }
 
     .login-card button {
       width: 100%;
-      height: 46px;
+      height: 48px;
       background-color: #0284c7;
       color: #ffffff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
 
-    .login-card button:active {
+    .login-card button:hover {
       background-color: #0369a1;
     }
 
@@ -93,121 +112,218 @@
       color: #dc2626;
       font-size: 12px;
       font-weight: 600;
-      margin-top: 10px;
+      margin-top: 12px;
       display: none;
-    }
-
-    /* Container do Anúncio na Tela de Login */
-    .ad-container-login {
-      margin-top: 20px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     /* Conteúdo Principal do Aplicativo */
     #appContent {
       display: none;
+      background-color: #f8fafc;
+      min-height: 100vh;
     }
 
-    header {
-      margin-bottom: 14px;
+    /* Top Navbar */
+    .navbar {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    header h1 {
-      font-size: 20px;
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      background: #0284c7;
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .nav-title {
+      font-size: 16px;
       font-weight: 700;
-      color: #0f172a;
+      letter-spacing: -0.3px;
     }
 
-    header p {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 2px;
+    .nav-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-export {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-export:hover {
+      background: #059669;
     }
 
     .btn-logout {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #475569;
+      background: #334155;
+      border: none;
+      color: #f8fafc;
       font-size: 12px;
       font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    /* Resumo Rápido */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .summary-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-    }
-
-    .summary-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-    }
-
-    .summary-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-top: 4px;
-    }
-
-    .banner-status {
-      padding: 10px 12px;
+      padding: 8px 12px;
       border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #475569;
+    }
+
+    /* Container de Conteúdo */
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Status Geral */
+    .banner-status {
+      padding: 12px 16px;
+      border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border: 1px solid transparent;
     }
 
     .banner-ok {
       background-color: #dcfce7;
       color: #166534;
-      border: 1px solid #bbf7d0;
+      border-color: #bbf7d0;
     }
 
     .banner-alert {
       background-color: #fee2e2;
       color: #991b1b;
-      border: 1px solid #fecaca;
+      border-color: #fecaca;
+      animation: pulseAlert 2s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.005); }
+    }
+
+    /* Resumo Rápido */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .summary-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .summary-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 6px;
+    }
+
+    .summary-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Layout Responsivo Notebook / Desktop vs Mobile */
+    .main-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (min-width: 1024px) {
+      .main-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        align-items: start;
+      }
     }
 
     /* Card Formulário */
     .form-card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
+      border-radius: 14px;
+      padding: 20px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
     .form-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .field {
@@ -231,18 +347,19 @@
       font-size: 12px;
       font-weight: 600;
       color: #334155;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
 
     input {
       width: 100%;
       height: 44px;
-      padding: 0 10px;
+      padding: 0 12px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14px;
       background-color: #ffffff;
       outline: none;
+      transition: all 0.2s;
     }
 
     input:focus {
@@ -255,18 +372,20 @@
       font-weight: 700;
       text-transform: uppercase;
       color: #0284c7;
-      margin: 14px 0 8px 0;
+      margin: 16px 0 10px 0;
+      letter-spacing: 0.5px;
     }
 
     .live-preview {
       background: #f1f5f9;
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       font-size: 13px;
+      border: 1px solid #e2e8f0;
     }
 
     .live-preview strong {
@@ -284,220 +403,407 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
     }
 
-    .btn-submit:active {
+    .btn-submit:hover {
       background-color: #0369a1;
     }
 
-    /* Lista de Fardos em Cards */
+    /* Coluna Direita (Gráficos e Listagem) */
+    .dashboard-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Seção de Gráficos */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .charts-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .chart-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .chart-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: 220px;
+    }
+
+    /* Listagem de Fardos */
+    .list-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
     .list-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f1f5f9;
     }
 
     .list-title {
       font-size: 15px;
       font-weight: 700;
+      color: #0f172a;
+    }
+
+    .btn-danger-outline {
+      background: none;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-danger-outline:hover {
+      background: #fee2e2;
     }
 
     .empty-state {
       text-align: center;
-      padding: 30px 16px;
-      background: #ffffff;
+      padding: 40px 16px;
+      background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 10px;
       color: #94a3b8;
       font-size: 14px;
     }
 
-    .bale-card {
+    /* Cards e Tabela Responsiva de Fardos */
+    .bale-items-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .bale-item {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      padding: 12px 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s;
     }
 
-    .bale-card.hotspot {
+    .bale-item.hotspot {
       border-left: 5px solid #dc2626;
+      background-color: #fffaf0;
     }
 
-    .bale-card-top {
+    .bale-item.wet {
+      border-left: 5px solid #ea580c;
+    }
+
+    .bale-item-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
     }
 
-    .bale-card-title {
-      font-size: 15px;
+    .bale-badge-id {
+      font-size: 14px;
       font-weight: 700;
       color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .bale-metrics {
+    .tag-warning {
+      background: #fee2e2;
+      color: #dc2626;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .tag-humidity {
+      background: #ffedd5;
+      color: #c2410c;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .bale-item-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
       font-size: 13px;
       color: #475569;
       margin-bottom: 8px;
     }
 
-    .probe-points {
+    @media (min-width: 600px) {
+      .bale-item-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .bale-item-points {
       background: #f8fafc;
       border-radius: 6px;
       padding: 6px 10px;
-      font-size: 12px;
+      font-size: 11px;
       display: flex;
       justify-content: space-between;
       color: #64748b;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
+      border: 1px solid #f1f5f9;
     }
 
     .btn-delete-card {
       background: none;
       border: none;
-      color: #ef4444;
+      color: #94a3b8;
       font-size: 12px;
-      font-weight: 600;
       cursor: pointer;
-      padding: 4px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .btn-delete-card:hover {
+      color: #dc2626;
     }
   </style>
 </head>
 <body>
 
-  <!-- Tela de Bloqueio (Visível por padrão para visitantes e para o bot do A-ADS) -->
+  <!-- Tela de Bloqueio -->
   <div id="lockScreen">
     <div class="login-card">
-      <h2>Acesso Restrito</h2>
-      <p>Digite a senha para acessar o controle de fardos</p>
+      <span class="login-badge">Portal Corporativo</span>
+      <h2>Monitoramento de Fardos</h2>
+      <p>Termometria multiponto e pesagem de fardos em campo</p>
       <form id="passwordForm">
-        <input type="password" id="accessPassword" placeholder="Senha de acesso" autocomplete="current-password" required>
-        <button type="submit">Entrar no Sistema</button>
-        <div id="passwordError" class="error-msg">Senha incorreta. Tente novamente.</div>
+        <input type="password" id="accessPassword" placeholder="Senha de acesso da unidade" autocomplete="current-password" required>
+        <button type="submit">Entrar no Terminal</button>
+        <div id="passwordError" class="error-msg">Credencial incorreta. Tente novamente.</div>
       </form>
-
-      <!-- BEGIN AADS AD UNIT 2454885 -->
-      <div class="ad-container-login">
-        <iframe data-aa='2454885' src='//acceptable.a-ads.com/2454885/?size=Adaptive' 
-                style='border:0; padding:0; width:100%; max-width:320px; height:50px; overflow:hidden; display:block; margin:auto;'></iframe>
-      </div>
-      <!-- END AADS AD UNIT 2454885 -->
     </div>
   </div>
 
-  <!-- Conteúdo do Aplicativo -->
+  <!-- Conteúdo do Aplicativo / Dashboard -->
   <div id="appContent">
-    <header>
-      <div>
-        <h1>Termometria & Pesagem</h1>
-        <p>Monitoramento de fardos em campo</p>
+    <!-- Navbar Superior -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">F</div>
+        <div>
+          <div class="nav-title">AgroControle Cotton</div>
+          <div class="nav-subtitle">Terminal de Recepção & Armazém</div>
+        </div>
       </div>
-      <button type="button" class="btn-logout" onclick="logout()">Sair</button>
+      <div class="nav-actions">
+        <button type="button" class="btn-export" onclick="exportToCSV()" title="Baixar relatório em Excel">
+          <span>📊</span> Exportar CSV
+        </button>
+        <button type="button" class="btn-logout" onclick="logout()">Sair</button>
+      </div>
     </header>
 
-    <!-- Status Térmico Geral -->
-    <div id="statusBanner" class="banner-status banner-ok">
-      <span id="statusBannerText">Operação Estável</span>
-      <span id="statusBannerDetail">Sem registros</span>
-    </div>
-
-    <!-- Cards de Resumo -->
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="summary-title">Média Térmica</div>
-        <div class="summary-value" id="dispAvgTemp">0.0 °C</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-title">Umidade Média</div>
-        <div class="summary-value" id="dispAvgHum">0.0 %</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-title">Peso Total Líq.</div>
-        <div class="summary-value" id="dispTotalWeight">0.0 kg</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-title">Total Fardos</div>
-        <div class="summary-value" id="dispBaleCount">0</div>
-      </div>
-    </div>
-
-    <!-- Formulário Rápido -->
-    <section class="form-card">
-      <div class="form-title">Adicionar Fardo</div>
-      <form id="mobileForm">
-        <div class="field">
-          <label for="baleId">Identificação do Fardo / Lote</label>
-          <input type="text" id="baleId" placeholder="Ex: Lote 101" required>
+    <main class="dashboard-container">
+      <!-- Status Térmico Geral -->
+      <div id="statusBanner" class="banner-status banner-ok">
+        <div>
+          <strong id="statusBannerText">Operação Estável</strong>
+          <div id="statusBannerSub" style="font-size: 11px; opacity: 0.85;">Todos os fardos dentro do parâmetro de segurança</div>
         </div>
-
-        <div class="field-row-2 field">
-          <div>
-            <label for="grossWeight">Bruto (kg)</label>
-            <input type="number" step="0.1" inputmode="decimal" id="grossWeight" placeholder="Ex: 228.0" required>
-          </div>
-          <div>
-            <label for="tareWeight">Tara (kg)</label>
-            <input type="number" step="0.1" inputmode="decimal" id="tareWeight" value="3.0" required>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="humidity">Umidade (%)</label>
-          <input type="number" step="0.1" inputmode="decimal" id="humidity" placeholder="Ex: 7.2" required>
-        </div>
-
-        <div class="sub-heading">Sonda Térmica Multiponto (°C)</div>
-
-        <div class="field-row-3 field">
-          <div>
-            <label for="p1">Ponto 1</label>
-            <input type="number" step="0.1" inputmode="decimal" id="p1" placeholder="Ex: 24.2" required>
-          </div>
-          <div>
-            <label for="p2">Ponto 2</label>
-            <input type="number" step="0.1" inputmode="decimal" id="p2" placeholder="Ex: 25.0" required>
-          </div>
-          <div>
-            <label for="p3">Ponto 3</label>
-            <input type="number" step="0.1" inputmode="decimal" id="p3" placeholder="Ex: 24.6" required>
-          </div>
-        </div>
-
-        <div class="live-preview">
-          <span>Média calculada:</span>
-          <strong id="liveAvgDisplay">0.0 °C</strong>
-        </div>
-
-        <button type="submit" class="btn-submit">Salvar Fardo</button>
-      </form>
-    </section>
-
-    <!-- Listagem Dinâmica -->
-    <section>
-      <div class="list-header">
-        <div class="list-title">Histórico Registrado</div>
-        <button type="button" id="btnClearAll" onclick="clearAllBales()" class="btn-delete-card" style="color: #64748b; display: none;">Limpar Tudo</button>
+        <span id="statusBannerDetail" style="font-size: 14px; font-weight: 700;">Sem registros</span>
       </div>
-      <div id="baleCardsContainer"></div>
-    </section>
+
+      <!-- Métricas Resumidas -->
+      <section class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-title">Média Térmica</div>
+          <div class="summary-value" id="dispAvgTemp">0.0 °C</div>
+          <div class="summary-sub">Limite seguro: &lt; 30.0 °C</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">Umidade Média</div>
+          <div class="summary-value" id="dispAvgHum">0.0 %</div>
+          <div class="summary-sub">Limite padrão: &lt; 8.5 %</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">Peso Líquido Total</div>
+          <div class="summary-value" id="dispTotalWeight">0.0 kg</div>
+          <div class="summary-sub" id="dispAvgWeight">Média: 0.0 kg/fardo</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">Total de Fardos</div>
+          <div class="summary-value" id="dispBaleCount">0</div>
+          <div class="summary-sub" id="dispHotspotCount">Hotspots: 0</div>
+        </div>
+      </section>
+
+      <!-- Grade Principal: Form à Esquerda + Visualizações à Direita -->
+      <div class="main-grid">
+        <!-- Formulário de Entrada -->
+        <section class="form-card">
+          <div class="form-title">
+            <span>Registrar Novo Fardo</span>
+            <span style="font-size: 12px; font-weight: 500; color: #64748b;">Entrada Contínua</span>
+          </div>
+
+          <form id="mobileForm">
+            <div class="field">
+              <label for="baleId">Identificação do Fardo / Etiqueta</label>
+              <input type="text" id="baleId" placeholder="Ex: FRD-2026-001" required>
+            </div>
+
+            <div class="field-row-2 field">
+              <div>
+                <label for="grossWeight">Bruto (kg)</label>
+                <input type="number" step="0.1" inputmode="decimal" id="grossWeight" placeholder="Ex: 228.5" required>
+              </div>
+              <div>
+                <label for="tareWeight">Tara Embalagem (kg)</label>
+                <input type="number" step="0.1" inputmode="decimal" id="tareWeight" value="3.0" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="humidity">Teor de Umidade (%)</label>
+              <input type="number" step="0.1" inputmode="decimal" id="humidity" placeholder="Ex: 7.5" required>
+            </div>
+
+            <div class="sub-heading">Sonda Térmica Multiponto (°C)</div>
+
+            <div class="field-row-3 field">
+              <div>
+                <label for="p1">Ponto 1</label>
+                <input type="number" step="0.1" inputmode="decimal" id="p1" placeholder="Ex: 24.2" required>
+              </div>
+              <div>
+                <label for="p2">Ponto 2</label>
+                <input type="number" step="0.1" inputmode="decimal" id="p2" placeholder="Ex: 25.0" required>
+              </div>
+              <div>
+                <label for="p3">Ponto 3</label>
+                <input type="number" step="0.1" inputmode="decimal" id="p3" placeholder="Ex: 24.6" required>
+              </div>
+            </div>
+
+            <div class="live-preview">
+              <span>Média Sonda Instantânea:</span>
+              <strong id="liveAvgDisplay">0.0 °C</strong>
+            </div>
+
+            <button type="submit" class="btn-submit">Salvar Fardo no Registro</button>
+          </form>
+        </section>
+
+        <!-- Coluna de Gráficos e Histórico -->
+        <div class="dashboard-col-right">
+          <!-- Gráficos Gerenciais -->
+          <section class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="chart-title">Temperatura & Umidade</span>
+                <span class="chart-badge">Sonda (°C) / Umid (%)</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="tempChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="chart-title">Peso Líquido por Fardo</span>
+                <span class="chart-badge">Kg Líquido</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="weightChart"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <!-- Listagem Histórica -->
+          <section class="list-card">
+            <div class="list-header">
+              <div class="list-title">Histórico de Fardos Registrados</div>
+              <button type="button" id="btnClearAll" onclick="clearAllBales()" class="btn-danger-outline" style="display: none;">
+                Limpar Lote
+              </button>
+            </div>
+            <div id="baleCardsContainer" class="bale-items-container"></div>
+          </section>
+        </div>
+      </div>
+    </main>
   </div>
 
   <script>
     // Gerenciamento de Senha
     const MASTER_PASS = "rodrigocardozo";
 
+    // Instâncias Globais dos Gráficos Chart.js
+    let tempChartInstance = null;
+    let weightChartInstance = null;
+
     function checkAuth() {
       const isAuth = sessionStorage.getItem("cotton_auth") === "true";
       if (isAuth) {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("appContent").style.display = "block";
+        initCharts();
         renderApp();
       } else {
         document.getElementById("lockScreen").style.display = "flex";
@@ -528,7 +834,7 @@
       checkAuth();
     }
 
-    // Persistência e Dados dos Fardos
+    // Persistência em LocalStorage
     let bales = JSON.parse(localStorage.getItem('cotton_bales_mobile')) || [];
 
     function saveToStorage() {
@@ -555,6 +861,118 @@
       document.getElementById(id).addEventListener('input', updateLivePreview);
     });
 
+    // Inicialização dos Gráficos com Chart.js
+    function initCharts() {
+      if (tempChartInstance && weightChartInstance) return;
+
+      const ctxTemp = document.getElementById('tempChart').getContext('2d');
+      tempChartInstance = new Chart(ctxTemp, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Temperatura Média (°C)',
+              data: [],
+              borderColor: '#dc2626',
+              backgroundColor: 'rgba(220, 38, 38, 0.1)',
+              borderWidth: 2,
+              tension: 0.2,
+              pointRadius: 4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Umidade (%)',
+              data: [],
+              borderColor: '#0284c7',
+              backgroundColor: 'rgba(2, 132, 199, 0.1)',
+              borderWidth: 2,
+              tension: 0.2,
+              pointRadius: 4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: {
+              type: 'linear',
+              position: 'left',
+              suggestedMin: 20,
+              suggestedMax: 35,
+              ticks: { callback: v => v + '°C' }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              suggestedMin: 5,
+              suggestedMax: 12,
+              grid: { drawOnChartArea: false },
+              ticks: { callback: v => v + '%' }
+            }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+          }
+        }
+      });
+
+      const ctxWeight = document.getElementById('weightChart').getContext('2d');
+      weightChartInstance = new Chart(ctxWeight, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Peso Líquido (kg)',
+              data: [],
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              suggestedMin: 180,
+              suggestedMax: 260,
+              ticks: { callback: v => v + ' kg' }
+            }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function updateCharts() {
+      if (!tempChartInstance || !weightChartInstance) return;
+
+      // Pegamos os últimos 15 fardos em ordem cronológica (invertendo o unshift)
+      const chronBales = [...bales].reverse().slice(-15);
+
+      const labels = chronBales.map(b => b.id);
+      const temps = chronBales.map(b => b.avgTemp);
+      const hums = chronBales.map(b => b.humidity);
+      const weights = chronBales.map(b => b.netWeight);
+
+      tempChartInstance.data.labels = labels;
+      tempChartInstance.data.datasets[0].data = temps;
+      tempChartInstance.data.datasets[1].data = hums;
+      tempChartInstance.update();
+
+      weightChartInstance.data.labels = labels;
+      weightChartInstance.data.datasets[0].data = weights;
+      weightChartInstance.update();
+    }
+
+    // Renderização do Aplicativo
     function renderApp() {
       const container = document.getElementById('baleCardsContainer');
       const btnClear = document.getElementById('btnClearAll');
@@ -563,14 +981,14 @@
       let totalNetWeight = 0;
       let sumTemp = 0;
       let sumHum = 0;
-      let hasHotspot = false;
+      let hotspotCount = 0;
       const count = bales.length;
 
       if (count === 0) {
         btnClear.style.display = 'none';
         container.innerHTML = `<div class="empty-state">Nenhum fardo cadastrado até o momento.</div>`;
       } else {
-        btnClear.style.display = 'block';
+        btnClear.style.display = 'inline-block';
         bales.forEach((bale, index) => {
           totalNetWeight += bale.netWeight;
           sumTemp += bale.avgTemp;
@@ -579,25 +997,30 @@
           const isHot = bale.temp1 > 30.0 || bale.temp2 > 30.0 || bale.temp3 > 30.0 || bale.avgTemp > 30.0;
           const isWet = bale.humidity > 8.5;
 
-          if (isHot || isWet) hasHotspot = true;
+          if (isHot) hotspotCount++;
 
           const card = document.createElement('div');
-          card.className = `bale-card ${isHot ? 'hotspot' : ''}`;
+          card.className = `bale-item ${isHot ? 'hotspot' : ''} ${isWet && !isHot ? 'wet' : ''}`;
           card.innerHTML = `
-            <div class="bale-card-top">
-              <div class="bale-card-title">${bale.id}</div>
-              <button class="btn-delete-card" onclick="removeBale(${index})">Excluir</button>
+            <div class="bale-item-top">
+              <div class="bale-badge-id">
+                <span>${bale.id}</span>
+                ${isHot ? '<span class="tag-warning">Alerta Térmico</span>' : ''}
+                ${isWet ? '<span class="tag-humidity">Umidade Alta</span>' : ''}
+              </div>
+              <button class="btn-delete-card" onclick="removeBale(${index})" title="Excluir este fardo">Excluir</button>
             </div>
-            <div class="bale-metrics">
+            <div class="bale-item-grid">
               <div>Líquido: <strong>${bale.netWeight.toFixed(1)} kg</strong></div>
-              <div>Umidade: <strong style="${isWet ? 'color: #dc2626;' : ''}">${bale.humidity.toFixed(1)}%</strong></div>
+              <div>Bruto: ${bale.grossWeight.toFixed(1)} kg</div>
+              <div>Umidade: <strong style="${isWet ? 'color: #ea580c;' : ''}">${bale.humidity.toFixed(1)}%</strong></div>
               <div>Média Sonda: <strong style="${isHot ? 'color: #dc2626;' : ''}">${bale.avgTemp.toFixed(1)}°C</strong></div>
-              <div>Bruto / Tara: ${bale.grossWeight.toFixed(1)} / ${bale.tare.toFixed(1)}kg</div>
             </div>
-            <div class="probe-points">
-              <span>P1: ${bale.temp1.toFixed(1)}°C</span>
-              <span>P2: ${bale.temp2.toFixed(1)}°C</span>
-              <span>P3: ${bale.temp3.toFixed(1)}°C</span>
+            <div class="bale-item-points">
+              <span>Sonda P1: <strong>${bale.temp1.toFixed(1)}°C</strong></span>
+              <span>Sonda P2: <strong>${bale.temp2.toFixed(1)}°C</strong></span>
+              <span>Sonda P3: <strong>${bale.temp3.toFixed(1)}°C</strong></span>
+              <span>Tara: ${bale.tare.toFixed(1)} kg</span>
             </div>
           `;
           container.appendChild(card);
@@ -606,33 +1029,42 @@
 
       const avgT = count > 0 ? (sumTemp / count).toFixed(1) : '0.0';
       const avgH = count > 0 ? (sumHum / count).toFixed(1) : '0.0';
+      const avgWeight = count > 0 ? (totalNetWeight / count).toFixed(1) : '0.0';
 
       document.getElementById('dispAvgTemp').innerText = `${avgT} °C`;
       document.getElementById('dispAvgHum').innerText = `${avgH} %`;
       document.getElementById('dispTotalWeight').innerText = `${totalNetWeight.toFixed(1)} kg`;
+      document.getElementById('dispAvgWeight').innerText = `Média: ${avgWeight} kg/fardo`;
       document.getElementById('dispBaleCount').innerText = count;
+      document.getElementById('dispHotspotCount').innerText = `Hotspots: ${hotspotCount}`;
 
       const banner = document.getElementById('statusBanner');
       const bannerText = document.getElementById('statusBannerText');
+      const bannerSub = document.getElementById('statusBannerSub');
       const bannerDetail = document.getElementById('statusBannerDetail');
 
       if (count === 0) {
         banner.className = 'banner-status banner-ok';
         bannerText.innerText = 'Operação Estável';
+        bannerSub.innerText = 'Nenhum registro de fardo armazenado';
         bannerDetail.innerText = 'Sem registros';
-      } else if (hasHotspot || parseFloat(avgT) > 30.0) {
+      } else if (hotspotCount > 0 || parseFloat(avgT) > 30.0) {
         banner.className = 'banner-status banner-alert';
-        bannerText.innerText = 'Alerta Térmico Detectado';
-        bannerDetail.innerText = '> 30°C';
+        bannerText.innerText = 'Risco Térmico Identificado';
+        bannerSub.innerText = `Existe(m) ${hotspotCount} fardo(s) com temperatura acima de 30°C. Inspecione o pátio.`;
+        bannerDetail.innerText = `${hotspotCount} Crítico(s)`;
       } else {
         banner.className = 'banner-status banner-ok';
-        bannerText.innerText = 'Operação Estável';
-        bannerDetail.innerText = 'Normal';
+        bannerText.innerText = 'Operação Estável e Segura';
+        bannerSub.innerText = 'Todos os fardos monitorados operam dentro das normas técnicas';
+        bannerDetail.innerText = 'Parâmetros OK';
       }
 
+      updateCharts();
       saveToStorage();
     }
 
+    // Formulário de Adição
     document.getElementById('mobileForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -656,7 +1088,8 @@
         temp2: p2,
         temp3: p3,
         avgTemp: avgTemp,
-        humidity: hum
+        humidity: hum,
+        timestamp: new Date().toISOString()
       });
 
       renderApp();
@@ -672,15 +1105,52 @@
     });
 
     function removeBale(index) {
-      bales.splice(index, 1);
-      renderApp();
+      if (confirm(`Deseja remover o fardo ${bales[index].id}?`)) {
+        bales.splice(index, 1);
+        renderApp();
+      }
     }
 
     function clearAllBales() {
-      if (confirm('Deseja apagar todos os registros da memória?')) {
+      if (confirm('Atenção: deseja realmente limpar todo o histórico de fardos da memória?')) {
         bales = [];
         renderApp();
       }
+    }
+
+    // Exportação dos dados para formato compatível com Excel / Google Sheets
+    function exportToCSV() {
+      if (bales.length === 0) {
+        alert('Não há dados cadastrados para exportar.');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Identificacao;Peso Bruto (kg);Tara (kg);Peso Liquido (kg);Umidade (%);Ponto 1 (C);Ponto 2 (C);Ponto 3 (C);Media Sonda (C);Data Registro\n";
+
+      bales.forEach(b => {
+        const row = [
+          `"${b.id}"`,
+          b.grossWeight.toFixed(2),
+          b.tare.toFixed(2),
+          b.netWeight.toFixed(2),
+          b.humidity.toFixed(2),
+          b.temp1.toFixed(2),
+          b.temp2.toFixed(2),
+          b.temp3.toFixed(2),
+          b.avgTemp.toFixed(2),
+          b.timestamp ? `"${b.timestamp}"` : '""'
+        ].join(";");
+        csvContent += row + "\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `relatorio_fardos_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     window.addEventListener('DOMContentLoaded', checkAuth);
